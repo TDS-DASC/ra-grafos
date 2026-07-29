@@ -15,6 +15,8 @@ const state = {
   scene: null,
   zoom: 1,
   rotationY: 0,
+  audioContext: null,
+  soundEnabled: true,
 };
 
 const els = {
@@ -41,7 +43,9 @@ const els = {
   eduPartial: document.querySelector("#eduPartial"),
   eduSequence: document.querySelector("#eduSequence"),
   eduPseudo: document.querySelector("#eduPseudo code"),
-  qrCanvas: document.querySelector("#qrCanvas"),
+  soundToggle: document.querySelector("#soundToggle"),
+  qrCode: document.querySelector("#qrCode"),
+  qrFallback: document.querySelector("#qrFallback"),
 };
 
 class TreeNode {
@@ -84,6 +88,7 @@ function bindEvents() {
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-action]");
     if (!button) return;
+    unlockAudio();
     const action = button.dataset.action;
     if (action === "root") showRoot();
     if (action === "children") showChildren();
@@ -96,12 +101,14 @@ function bindEvents() {
 
   els.insertForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    insertValue(Number(els.insertValue.value));
+    unlockAudio();
+    insertValue(readIntegerInput(els.insertValue, "insertar"));
   });
 
   els.searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    searchValue(Number(els.searchValue.value));
+    unlockAudio();
+    searchValue(readIntegerInput(els.searchValue, "buscar"));
   });
 
   els.clearInsert.addEventListener("click", () => {
@@ -112,6 +119,12 @@ function bindEvents() {
   els.startArButton.addEventListener("click", startAr);
   els.exitArButton.addEventListener("click", () => createScene("explore"));
   els.exploreButton.addEventListener("click", () => createScene("explore"));
+  els.soundToggle.addEventListener("click", () => {
+    state.soundEnabled = !state.soundEnabled;
+    unlockAudio();
+    els.soundToggle.textContent = state.soundEnabled ? "Sonido activado" : "Sonido desactivado";
+    els.soundToggle.setAttribute("aria-pressed", String(state.soundEnabled));
+  });
 
   els.controlsToggle.addEventListener("click", () => {
     const isOpen = els.controlsToggle.getAttribute("aria-expanded") === "true";
@@ -149,6 +162,7 @@ function insertNode(root, value, depth = 0) {
 function createScene(mode) {
   clearTimers();
   state.mode = mode;
+  document.body.classList.toggle("ar-mode", mode === "ar");
   state.zoom = 1;
   state.rotationY = 0;
   els.sceneHost.replaceChildren();
@@ -217,7 +231,7 @@ function createTreeEntity(isAr) {
   const group = document.createElement("a-entity");
   group.id = "treeGroup";
   group.setAttribute("position", isAr ? "0 0.12 0" : "0 -1.05 0");
-  group.setAttribute("scale", isAr ? "0.34 0.34 0.34" : "1 1 1");
+  group.setAttribute("scale", isAr ? "0.42 0.42 0.42" : "1 1 1");
   if (isAr) group.setAttribute("rotation", "-90 0 0");
   state.treeGroup = group;
   return group;
@@ -419,7 +433,7 @@ function showLeaves() {
 }
 
 async function insertValue(value) {
-  if (!Number.isFinite(value)) return announceError("Escribe un valor numérico para insertar.");
+  if (value === null) return;
   if (countNodes(state.root) >= MAX_NODES) return announceError("El árbol está limitado a 15 nodos para conservar la legibilidad.");
   if (findNode(state.root, value)) return announceError("No se permiten valores duplicados en este árbol.");
 
@@ -472,7 +486,7 @@ async function insertValue(value) {
 }
 
 async function searchValue(value) {
-  if (!Number.isFinite(value)) return announceError("Escribe un valor numérico para buscar.");
+  if (value === null) return;
   disableControls(true);
   clearTimers();
   clearHighlights();
@@ -593,6 +607,7 @@ function animateStep(value, edu) {
   clearHighlights();
   highlight(value, "#276ef1");
   updateEducation(edu);
+  playStepSound(value);
   return new Promise((resolve) => {
     const timer = window.setTimeout(resolve, STEP_DELAY);
     state.timers.push(timer);
@@ -673,6 +688,7 @@ function resetAll() {
 }
 
 async function startAr() {
+  unlockAudio();
   if (!navigator.mediaDevices?.getUserMedia) {
     announceError("Este navegador no expone la cámara; se mantiene el modo Explorar en 3D.");
     createScene("explore");
@@ -697,6 +713,8 @@ async function startAr() {
   renderizar árbol sobre marcador`,
     });
     createScene("ar");
+    setControlsOpen(false);
+    setEducationOpen(false);
   } catch (error) {
     announceError("No se pudo usar la cámara; se activó el modo alternativo Explorar en 3D.");
     createScene("explore");
@@ -704,11 +722,21 @@ async function startAr() {
 }
 
 function drawQr() {
-  if (!window.QRCode) return;
-  window.QRCode.toCanvas(els.qrCanvas, window.location.href, {
-    width: 132,
-    margin: 1,
-    color: { dark: "#17201b", light: "#ffffff" },
+  const url = window.location.href;
+  els.qrFallback.href = url;
+  els.qrFallback.textContent = url;
+  if (!window.QRCode || !els.qrCode) {
+    els.qrCode.textContent = "QR no disponible. Usa el enlace inferior.";
+    return;
+  }
+  els.qrCode.replaceChildren();
+  new window.QRCode(els.qrCode, {
+    text: url,
+    width: 120,
+    height: 120,
+    colorDark: "#17201b",
+    colorLight: "#ffffff",
+    correctLevel: window.QRCode.CorrectLevel.M,
   });
 }
 
@@ -716,8 +744,64 @@ function disableControls(disabled) {
   state.isAnimating = disabled;
   document.querySelectorAll("button, input").forEach((control) => {
     if (control.id === "exitArButton") return;
+    if (control.id === "controlsToggle") return;
+    if (control.id === "educationToggle") return;
+    if (control.id === "soundToggle") return;
     control.disabled = disabled;
   });
+}
+
+function setControlsOpen(isOpen) {
+  els.controlsToggle.setAttribute("aria-expanded", String(isOpen));
+  els.controlsBody.classList.toggle("hidden", !isOpen);
+}
+
+function setEducationOpen(isOpen) {
+  els.educationToggle.setAttribute("aria-expanded", String(isOpen));
+  els.educationPanel.classList.toggle("open", isOpen);
+}
+
+function readIntegerInput(input, actionName) {
+  const rawValue = input.value.trim();
+  if (!rawValue) {
+    announceError(`Escribe un valor numérico para ${actionName}.`);
+    input.focus();
+    return null;
+  }
+  const value = Number(rawValue);
+  if (!Number.isInteger(value)) {
+    announceError("Usa únicamente números enteros.");
+    input.focus();
+    return null;
+  }
+  return value;
+}
+
+function unlockAudio() {
+  if (!state.soundEnabled) return;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  if (!state.audioContext) state.audioContext = new AudioContext();
+  if (state.audioContext.state === "suspended") state.audioContext.resume();
+}
+
+function playStepSound(value) {
+  if (!state.soundEnabled) return;
+  unlockAudio();
+  const context = state.audioContext;
+  if (!context) return;
+  const now = context.currentTime;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(440 + (Math.abs(value) % 7) * 35, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.12, now + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.13);
 }
 
 function clearTimers() {

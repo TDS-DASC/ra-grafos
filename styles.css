@@ -284,6 +284,32 @@ h2 {
   border-radius: 8px;
 }
 
+#qrCode {
+  display: grid;
+  place-items: center;
+  width: 132px;
+  min-height: 132px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+#qrCode img,
+#qrCode canvas {
+  display: block;
+  width: 120px;
+  height: 120px;
+}
+
+.qr-fallback {
+  display: inline-block;
+  margin-top: 0.55rem;
+  color: var(--accent-strong);
+  font-size: 0.84rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
 .education-panel {
   position: fixed;
   right: 0;
@@ -355,6 +381,202 @@ pre {
     color: var(--accent-strong);
     font-size: 0.75rem;
     font-weight: 800;
+  }
+}
+
+body.ar-mode {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #000;
+}
+
+body.ar-mode .app-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20003;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: calc(0.55rem + env(safe-area-inset-top)) 0.75rem 0.55rem;
+  background: linear-gradient(180deg, rgba(10, 15, 13, 0.84), rgba(10, 15, 13, 0.42));
+  color: #fff;
+  pointer-events: none;
+}
+
+body.ar-mode .app-header > div:first-child {
+  min-width: 0;
+}
+
+body.ar-mode .eyebrow {
+  display: none;
+}
+
+body.ar-mode h1 {
+  max-width: none;
+  color: #fff;
+  font-size: clamp(1rem, 4.5vw, 1.35rem);
+  line-height: 1.1;
+}
+
+body.ar-mode .header-actions {
+  flex: 0 0 auto;
+  pointer-events: auto;
+}
+
+body.ar-mode .marker-link,
+body.ar-mode #startArButton {
+  display: none;
+}
+
+body.ar-mode #exitArButton {
+  min-height: 48px;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+body.ar-mode .app-shell {
+  display: block;
+  padding: 0;
+}
+
+body.ar-mode .stage-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+  box-shadow: none;
+}
+
+body.ar-mode .stage-toolbar {
+  position: fixed;
+  top: calc(4rem + env(safe-area-inset-top));
+  right: 0.75rem;
+  left: 0.75rem;
+  z-index: 20002;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+  background: rgba(10, 15, 13, 0.72);
+  color: #fff;
+  pointer-events: none;
+}
+
+body.ar-mode .stage-toolbar span {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.9rem;
+}
+
+body.ar-mode .stage-toolbar::after {
+  display: none;
+}
+
+body.ar-mode #exploreButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 44px;
+  background: rgba(255, 255, 255, 0.94);
+  pointer-events: auto;
+}
+
+body.ar-mode .scene-host {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100svh;
+  min-height: 100svh;
+  background: #000;
+}
+
+body.ar-mode .scene-host a-scene,
+body.ar-mode .scene-host .a-canvas,
+body.ar-mode video {
+  width: 100vw !important;
+  height: 100svh !important;
+  object-fit: cover;
+}
+
+body.ar-mode .control-panel {
+  z-index: 20005;
+  max-height: min(62svh, 35rem);
+  border-radius: 12px 12px 0 0;
+  background: rgba(255, 255, 255, 0.96);
+  font-size: 16px;
+}
+
+body.ar-mode .panel-toggle,
+body.ar-mode .education-toggle {
+  min-height: 56px;
+  font-size: 1rem;
+}
+
+body.ar-mode .controls-body {
+  padding: 0.85rem 0.85rem calc(1rem + env(safe-area-inset-bottom));
+}
+
+body.ar-mode .control-group,
+body.ar-mode .qr-card {
+  padding: 0.8rem;
+}
+
+body.ar-mode .button-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.ar-mode button,
+body.ar-mode input {
+  min-height: 48px;
+}
+
+body.ar-mode .education-panel {
+  z-index: 20006;
+  font-size: 16px;
+}
+
+@media (max-width: 520px) {
+  .app-header {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .header-actions {
+    gap: 0.45rem;
+  }
+
+  .ghost-action,
+  .marker-link,
+  .primary-action {
+    padding-right: 0.7rem;
+    padding-left: 0.7rem;
+    font-size: 0.92rem;
+  }
+
+  .app-shell {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  .scene-host {
+    height: 58svh;
+    min-height: 28rem;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .button-grid {
+    grid-template-columns: 1fr;
   }
 }
 

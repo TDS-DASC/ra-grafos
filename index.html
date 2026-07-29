@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module" src="app.js"></script>
   </head>
   <body>
@@ -53,6 +53,7 @@
               <button type="button" data-action="children">Hijos</button>
               <button type="button" data-action="leaves">Nodos hoja</button>
               <button type="button" data-action="reset">Restablecer</button>
+              <button type="button" id="soundToggle" aria-pressed="true">Sonido activado</button>
             </div>
           </section>
 
@@ -61,7 +62,7 @@
             <form class="input-row" id="insertForm">
               <label class="sr-only" for="insertValue">Valor a insertar</label>
               <input id="insertValue" type="number" inputmode="numeric" placeholder="Valor" min="-999" max="999" />
-              <button type="submit">Insertar</button>
+              <button type="submit" id="insertButton">Insertar</button>
               <button type="button" class="icon-button" id="clearInsert" aria-label="Limpiar valor de inserción">×</button>
             </form>
           </section>
@@ -87,7 +88,8 @@
           <section class="qr-card" aria-label="Abrir en teléfono">
             <h2>Usar en teléfono</h2>
             <p>Escanea este código desde el móvil cuando publiques el sitio o lo sirvas en red local.</p>
-            <canvas id="qrCanvas" width="132" height="132" aria-label="Código QR de la página actual"></canvas>
+            <div id="qrCode" aria-label="Código QR de la página actual"></div>
+            <a id="qrFallback" class="qr-fallback" href="#" target="_blank" rel="noreferrer">Abrir URL actual</a>
           </section>
         </div>
       </aside>
