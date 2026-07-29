@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Prototipo educativo para visualizar un árbol binario de búsqueda en 3D y realidad aumentada con A-Frame y AR.js."
+    />
+    <title>Árboles binarios en realidad aumentada</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Matemáticas Discretas · Estructuras de Datos</p>
+        <h1>Árboles binarios en realidad aumentada</h1>
+      </div>
+      <div class="header-actions">
+        <a class="marker-link" href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank" rel="noreferrer">
+          Marcador Hiro
+        </a>
+        <button class="primary-action" id="startArButton" type="button">Iniciar realidad aumentada</button>
+        <button class="ghost-action hidden" id="exitArButton" type="button">Salir de AR</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="stage-panel" aria-label="Visualización del árbol binario">
+        <div class="stage-toolbar">
+          <div>
+            <strong id="modeLabel">Explorar en 3D</strong>
+            <span id="statusMessage">Arrastra para rotar, usa rueda o gestos para acercar.</span>
+          </div>
+          <button class="ghost-action" id="exploreButton" type="button">Explorar en 3D</button>
+        </div>
+        <div id="sceneHost" class="scene-host" aria-live="polite"></div>
+      </section>
+
+      <aside class="control-panel" aria-label="Controles del árbol">
+        <button class="panel-toggle" id="controlsToggle" type="button" aria-expanded="true" aria-controls="controlsBody">
+          Operaciones
+        </button>
+        <div class="controls-body" id="controlsBody">
+          <section class="control-group" aria-label="Identificación de nodos">
+            <h2>Identificar</h2>
+            <div class="button-grid">
+              <button type="button" data-action="root">Nodo raíz</button>
+              <button type="button" data-action="children">Hijos</button>
+              <button type="button" data-action="leaves">Nodos hoja</button>
+              <button type="button" data-action="reset">Restablecer</button>
+            </div>
+          </section>
+
+          <section class="control-group" aria-label="Insertar valores">
+            <h2>Insertar valor</h2>
+            <form class="input-row" id="insertForm">
+              <label class="sr-only" for="insertValue">Valor a insertar</label>
+              <input id="insertValue" type="number" inputmode="numeric" placeholder="Valor" min="-999" max="999" />
+              <button type="submit">Insertar</button>
+              <button type="button" class="icon-button" id="clearInsert" aria-label="Limpiar valor de inserción">×</button>
+            </form>
+          </section>
+
+          <section class="control-group" aria-label="Buscar valores">
+            <h2>Buscar elemento</h2>
+            <form class="input-row" id="searchForm">
+              <label class="sr-only" for="searchValue">Valor a buscar</label>
+              <input id="searchValue" type="number" inputmode="numeric" placeholder="Valor" min="-999" max="999" />
+              <button type="submit">Buscar</button>
+            </form>
+          </section>
+
+          <section class="control-group" aria-label="Recorridos del árbol">
+            <h2>Recorridos</h2>
+            <div class="button-grid">
+              <button type="button" data-action="preorder">Preorden</button>
+              <button type="button" data-action="inorder">Inorden</button>
+              <button type="button" data-action="postorder">Posorden</button>
+            </div>
+          </section>
+
+          <section class="qr-card" aria-label="Abrir en teléfono">
+            <h2>Usar en teléfono</h2>
+            <p>Escanea este código desde el móvil cuando publiques el sitio o lo sirvas en red local.</p>
+            <canvas id="qrCanvas" width="132" height="132" aria-label="Código QR de la página actual"></canvas>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <section class="education-panel" aria-label="Panel educativo">
+      <button class="education-toggle" id="educationToggle" type="button" aria-expanded="true" aria-controls="educationBody">
+        ¿Qué estoy observando?
+      </button>
+      <div class="education-body" id="educationBody">
+        <div class="edu-grid">
+          <article>
+            <span>Operación</span>
+            <strong id="eduOperation">Exploración del árbol</strong>
+          </article>
+          <article>
+            <span>Definición</span>
+            <p id="eduDefinition">Un árbol binario de búsqueda organiza valores comparando cada nodo con sus descendientes.</p>
+          </article>
+          <article>
+            <span>Regla aplicada</span>
+            <p id="eduRule">Los valores menores van al subárbol izquierdo y los mayores al derecho.</p>
+          </article>
+          <article>
+            <span>Nodo actual</span>
+            <p id="eduCurrent">Ninguno seleccionado.</p>
+          </article>
+          <article>
+            <span>Resultado parcial</span>
+            <p id="eduPartial">Selecciona una operación para comenzar.</p>
+          </article>
+          <article>
+            <span>Secuencia completa</span>
+            <p id="eduSequence">Pendiente.</p>
+          </article>
+        </div>
+        <pre id="eduPseudo" aria-label="Pseudocódigo de la operación"><code>insertar(valor):
+  si árbol está vacío, crear raíz
+  si valor &lt; nodo, avanzar a izquierdo
+  si valor &gt; nodo, avanzar a derecho</code></pre>
+      </div>
+    </section>
+  </body>
+</html>
