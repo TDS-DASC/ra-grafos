@@ -159,7 +159,7 @@ function insertNode(root, value, depth = 0) {
   return root;
 }
 
-function createScene(mode) {
+function createScene(mode, isArReady = false) {
   clearTimers();
   state.mode = mode;
   document.body.classList.toggle("ar-mode", mode === "ar");
@@ -182,21 +182,21 @@ function createScene(mode) {
   scene.setAttribute("loading-screen", "enabled: false");
   scene.setAttribute("keyboard-shortcuts", "enterVR: false");
 
-  if (mode === "ar") {
+  if (mode === "ar" && isArReady) {
     scene.setAttribute("arjs", "sourceType: webcam; facingMode: environment; debugUIEnabled: false");
-  } else {
+  } else if (mode !== "ar") {
     scene.setAttribute("background", "color: #dfe9e2");
   }
 
   els.sceneHost.append(scene);
   state.scene = scene;
 
-  if (mode === "ar") {
+  if (mode === "ar" && isArReady) {
     const marker = document.createElement("a-marker");
     marker.setAttribute("preset", "hiro");
     marker.append(createTreeEntity(true));
     scene.append(marker, createCamera(true));
-  } else {
+  } else if (mode !== "ar") {
     scene.append(createLights(), createTreeEntity(false), createCamera(false));
     setupExploreGestures();
   }
@@ -712,7 +712,7 @@ async function startAr() {
   detectar marcador Hiro
   renderizar árbol sobre marcador`,
     });
-    createScene("ar");
+    createScene("ar", true);
     setControlsOpen(false);
     setEducationOpen(false);
   } catch (error) {
