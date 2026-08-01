@@ -416,9 +416,9 @@ body.ar-mode .eyebrow {
 }
 
 body.ar-mode h1 {
-  max-width: none;
+  max-width: 90%;
   color: #fff;
-  font-size: clamp(1rem, 4.5vw, 1.35rem);
+  font-size: clamp(1.1rem, 5vw, 1.6rem);
   line-height: 1.1;
 }
 
@@ -455,21 +455,23 @@ body.ar-mode .stage-panel {
 
 body.ar-mode .stage-toolbar {
   position: fixed;
-  top: calc(4rem + env(safe-area-inset-top));
+  top: calc(5rem + env(safe-area-inset-top));
   right: 0.75rem;
   left: 0.75rem;
   z-index: 20002;
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  padding: 0.7rem 0.8rem;
-  background: rgba(10, 15, 13, 0.72);
+  padding: 0.85rem 1rem;
+  background: rgba(10, 15, 13, 0.8);
   color: #fff;
   pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
 body.ar-mode .stage-toolbar span {
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 body.ar-mode .stage-toolbar::after {
