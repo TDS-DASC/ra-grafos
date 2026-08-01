@@ -46,6 +46,9 @@ const els = {
   soundToggle: document.querySelector("#soundToggle"),
   qrCode: document.querySelector("#qrCode"),
   qrFallback: document.querySelector("#qrFallback"),
+  hamburgerBtn: document.querySelector("#hamburgerBtn"),
+  overlay: document.querySelector("#overlay"),
+  controlPanel: document.querySelector("#controlPanel"),
 };
 
 class TreeNode {
@@ -136,6 +139,19 @@ function bindEvents() {
     const isOpen = els.educationToggle.getAttribute("aria-expanded") === "true";
     els.educationToggle.setAttribute("aria-expanded", String(!isOpen));
     els.educationPanel.classList.toggle("open", !isOpen);
+  });
+
+  els.hamburgerBtn.addEventListener("click", () => {
+    const isOpen = els.hamburgerBtn.getAttribute("aria-expanded") === "true";
+    els.hamburgerBtn.setAttribute("aria-expanded", String(!isOpen));
+    els.controlPanel.classList.toggle("open", !isOpen);
+    els.overlay.classList.toggle("active", !isOpen);
+  });
+
+  els.overlay.addEventListener("click", () => {
+    els.hamburgerBtn.setAttribute("aria-expanded", "false");
+    els.controlPanel.classList.remove("open");
+    els.overlay.classList.remove("active");
   });
 
   window.addEventListener("keydown", (event) => {

@@ -16,18 +16,25 @@
   </head>
   <body>
     <header class="app-header">
-      <div>
+      <div class="header-main">
         <p class="eyebrow">Matemáticas Discretas · Estructuras de Datos</p>
-        <h1>Árboles binarios en realidad aumentada</h1>
+        <h1 id="appTitle">Árboles binarios en realidad aumentada</h1>
       </div>
       <div class="header-actions">
-        <a class="marker-link" href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank" rel="noreferrer">
-          Marcador Hiro
-        </a>
+        <div class="action-group-mobile">
+          <a class="marker-link" href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank" rel="noreferrer">
+            Marcador Hiro
+          </a>
+        </div>
         <button class="primary-action" id="startArButton" type="button">Iniciar realidad aumentada</button>
         <button class="ghost-action hidden" id="exitArButton" type="button">Salir de AR</button>
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="controlsBody">
+          <span class="hamburger-icon"></span>
+        </button>
       </div>
     </header>
+
+    <div class="overlay" id="overlay"></div>
 
     <main class="app-shell">
       <section class="stage-panel" aria-label="Visualización del árbol binario">
@@ -41,7 +48,7 @@
         <div id="sceneHost" class="scene-host" aria-live="polite"></div>
       </section>
 
-      <aside class="control-panel" aria-label="Controles del árbol">
+      <aside class="control-panel" id="controlPanel" aria-label="Controles del árbol">
         <button class="panel-toggle" id="controlsToggle" type="button" aria-expanded="true" aria-controls="controlsBody">
           Operaciones
         </button>
